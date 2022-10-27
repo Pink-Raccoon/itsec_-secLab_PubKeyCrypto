@@ -63,6 +63,7 @@ public class RSA {
 		}
 
 		// --------> Your solution here! <--------
+		return plain;
 	}
 	
 	/** Decrypts the ciphertext with the private key.
@@ -85,6 +86,7 @@ public class RSA {
 		}
 		
 		// --------> Your solution here! <--------
+		return cipher;
 	}
 	
 	/** Saves the entire key pair.
@@ -120,6 +122,7 @@ public class RSA {
 	 */
 	public BigInteger sign(BigInteger message) throws BadMessageException {
 		// --------> Your solution here! <--------
+		return message;
 	}
 
 	/** Verifies a signature of a message.
@@ -131,6 +134,7 @@ public class RSA {
 	 */
 	public boolean verify(BigInteger message, BigInteger signature) throws BadMessageException {
 		// --------> Your solution here! <--------
+		return true;
 	}
 	
 	public boolean equals(RSA other) {

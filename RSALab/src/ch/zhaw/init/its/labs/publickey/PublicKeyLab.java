@@ -17,8 +17,8 @@ public class PublicKeyLab {
 		PublicKeyLab lab = new PublicKeyLab();
 		
 		lab.exercise1();
-		lab.exercise9GenerateSignature(args);
-		lab.exercise9VerifySignature(args);
+		//lab.exercise9GenerateSignature(args);
+		//lab.exercise9VerifySignature(args);
 	}
 
 	private void exercise9GenerateSignature(String[] args) throws BadMessageException, FileNotFoundException, IOException {
@@ -93,12 +93,15 @@ public class PublicKeyLab {
 		
 		int b = 1;
 		
-		// --------> Your solution here! <--------
-		
+		b = (int) (Math.log(wfBits)/ln2);
+
 		return b;
 	}
 
 	private double logW(int b) {
+
 		return 1.92 * Math.pow(b, 1.0/3.0) * Math.pow(Math.log(b), 2.0/3.0);
 	}
 }
+
+
