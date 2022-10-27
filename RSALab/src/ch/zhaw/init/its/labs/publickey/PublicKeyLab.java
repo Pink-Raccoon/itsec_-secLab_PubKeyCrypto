@@ -75,7 +75,7 @@ public class PublicKeyLab {
 			int keyLength = findRSAKeyLengthForWorkFactorInBits(wfBits);
 			System.out.format("%4d bits work factor: %6d bits RSA exponent\n", wfBits, keyLength);
 			double logW = logW(keyLength);
-			System.out.format("%4d bits work factor: %f logW\n", wfBits, logW);
+			System.out.format("W(%d)=(%f)\n", keyLength,logW);
 		}
 		
 
