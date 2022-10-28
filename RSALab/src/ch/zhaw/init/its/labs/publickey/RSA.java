@@ -5,12 +5,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OptionalDataException;
 import java.math.BigInteger;
+import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
+import java.security.SignatureException;
 
 
 
@@ -142,8 +144,11 @@ public class RSA {
 	 * @param message the message to sign
 	 * @return the signature for this message
 	 * @throws BadMessageException if something is wrong with this message or there is no private key
+	 * @throws SignatureException 
+	 * @throws InvalidKeyException 
+	 * @throws NoSuchAlgorithmException 
 	 */
-	public BigInteger sign(BigInteger message) throws BadMessageException {
+	public BigInteger sign(BigInteger message) throws BadMessageException, SignatureException, InvalidKeyException, NoSuchAlgorithmException {
 		Signature sig = Signature.getInstance("RSA");
 		sig.initSign(pair.getPrivate());
 		byte[] messageBytes = message.toByteArray();
@@ -174,7 +179,7 @@ public class RSA {
 		// --------> Your solution here! <--------
 		else {
 			throw new BadMessageException("message not between 1 and n-1");
-			return false;
+			
 		}
 	}
 	

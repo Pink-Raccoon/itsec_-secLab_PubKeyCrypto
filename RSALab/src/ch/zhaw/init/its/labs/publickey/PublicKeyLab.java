@@ -75,7 +75,6 @@ public class PublicKeyLab {
 			int keyLength = findRSAKeyLengthForWorkFactorInBits(wfBits);
 			System.out.format("%4d bits work factor: %6d bits RSA exponent\n", wfBits, keyLength);
 			
-			System.out.format("W(%d)=(%f)\n", keyLength,logW);
 		}
 		
 
@@ -93,23 +92,23 @@ public class PublicKeyLab {
 
 	private int findRSAKeyLengthForWorkFactorInBits(int wfBits) {
 		final double ln2 = Math.log(2.0);	
-		int c = 0;
-		double W_b;
+		int b = 1;
+		double powWfBits = wfBits / ln2;
+
 		
-		
-		
-		for(int b = 1; wfBits < W_b; b++) {
-			W_b = logW(b);
-			c = (int)(W_b/ln2);
+		while(logW(b)<=powWfBits) {
 			
-			
-			
+			b++;
 			
 		}
+			
+			return b;
+			
+	}
 		
 
-		return b;
-	}
+	
+
 
 	private double logW(int b) {
 
