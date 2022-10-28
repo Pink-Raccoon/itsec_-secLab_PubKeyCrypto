@@ -5,12 +5,21 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OptionalDataException;
 import java.math.BigInteger;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.Signature;
+
+import javax.management.modelmbean.ModelMBean;
 
 public class RSA {
 	private BigInteger n;
 	private BigInteger e;
 	private BigInteger d;
+	private KeyPair pair;
+	private PublicKey publicKey;
 	
 	private static final int DEFAULT_MODULUS_LENGTH = 2048;
 	private static final int DEFAULT_P_LENGTH = DEFAULT_MODULUS_LENGTH/2 - 9;
@@ -22,8 +31,15 @@ public class RSA {
 	 * 
 	 * This constructor generates a random RSA key pair of unknown, but substantial,
 	 * modulus length. The public exponent is 65537.
+	 * @throws NoSuchAlgorithmException 
 	 */
-	public RSA() {
+	public RSA() throws NoSuchAlgorithmException {
+		KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("RSA");
+		keyPairGen.initialize(DEFAULT_MODULUS_LENGTH);
+		pair = keyPairGen.generateKeyPair();
+		publicKey = pair.getPublic();
+		System.out.println("Keys generated");
+		
 		// --------> Your solution here! <--------
 	}
 	
@@ -60,10 +76,13 @@ public class RSA {
 		
 		if (plain.compareTo(BigInteger.ZERO) <= 0) {
 			throw new BadMessageException("plaintext too small");
+		}else {
+			BigInteger cipher =  n.mod(plain.pow(Integer.valueOf(PUBLIC_EXPONENT)));
+			return cipher;
 		}
-
+			
 		// --------> Your solution here! <--------
-		return plain;
+		
 	}
 	
 	/** Decrypts the ciphertext with the private key.
@@ -83,15 +102,19 @@ public class RSA {
 		
 		if (cipher.compareTo(BigInteger.ZERO) <= 0) {
 			throw new BadMessageException("ciphertext too small");
+		}else {
+			
+			BigInteger plain = n.mod(n.mod(d.pow(cipher.pow(Integer.valueOf(PUBLIC_EXPONENT)))));
+			return plain;
 		}
 		
-		// --------> Your solution here! <--------
-		return cipher;
+
+		
 	}
 	
 	/** Saves the entire key pair.
 	 * 
-	 * @param os the output strem to which to save the key pair
+	 * @param os the output stream to which to save the key pair
 	 * @throws IOException if saving goes wrong or there is no private key to save
 	 */
 	public void save(ObjectOutputStream os) throws IOException {
@@ -121,8 +144,18 @@ public class RSA {
 	 * @throws BadMessageException if something is wrong with this message or there is no private key
 	 */
 	public BigInteger sign(BigInteger message) throws BadMessageException {
+		Signature sig = Signature.getInstance("RSA");
+		sig.initSign(pair.getPrivate());
+		byte[] messageBytes = message.toByteArray();
+		sig.update(messageBytes);
+		byte[] signatureBytes = sig.sign();
+		BigInteger signature = new BigInteger(signatureBytes);
+		return signature;
+		
+		
+
 		// --------> Your solution here! <--------
-		return message;
+
 	}
 
 	/** Verifies a signature of a message.
@@ -133,8 +166,16 @@ public class RSA {
 	 * @throws BadMessageException if something is wrong with this message
 	 */
 	public boolean verify(BigInteger message, BigInteger signature) throws BadMessageException {
+		if((message.compareTo(BigInteger.valueOf(1))==-1 && message.compareTo(n.subtract(BigInteger.valueOf(1)))==1)
+				&& (signature.compareTo(BigInteger.valueOf(1))==-1 && signature.compareTo(n.subtract(BigInteger.valueOf(1)))==1))
+		{
+			return true;
+		}
 		// --------> Your solution here! <--------
-		return true;
+		else {
+			throw new BadMessageException("message not between 1 and n-1");
+			return false;
+		}
 	}
 	
 	public boolean equals(RSA other) {
