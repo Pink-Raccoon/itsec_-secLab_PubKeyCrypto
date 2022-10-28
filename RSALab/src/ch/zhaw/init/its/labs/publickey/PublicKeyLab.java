@@ -37,8 +37,8 @@ public class PublicKeyLab {
 		File f = new File(keypairFilename);
 		if (!f.canRead()) {
 			try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(f))) {
-				RSA rsa = new RSA();
-				rsa.save(os);
+
+
 			}
 		}
 	}
@@ -74,7 +74,7 @@ public class PublicKeyLab {
 		for (int wfBits : workFactorsBits) {
 			int keyLength = findRSAKeyLengthForWorkFactorInBits(wfBits);
 			System.out.format("%4d bits work factor: %6d bits RSA exponent\n", wfBits, keyLength);
-			double logW = logW(keyLength);
+			
 			System.out.format("W(%d)=(%f)\n", keyLength,logW);
 		}
 		
@@ -92,11 +92,21 @@ public class PublicKeyLab {
 	}
 
 	private int findRSAKeyLengthForWorkFactorInBits(int wfBits) {
-		final double ln2 = Math.log(2.0);
+		final double ln2 = Math.log(2.0);	
+		int c = 0;
+		double W_b;
 		
-		int b = 1;
 		
-		b = (int) (Math.log(wfBits)/ln2);
+		
+		for(int b = 1; wfBits < W_b; b++) {
+			W_b = logW(b);
+			c = (int)(W_b/ln2);
+			
+			
+			
+			
+		}
+		
 
 		return b;
 	}

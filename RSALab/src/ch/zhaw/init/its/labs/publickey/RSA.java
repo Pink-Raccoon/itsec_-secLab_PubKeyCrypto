@@ -12,7 +12,7 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 
-import javax.management.modelmbean.ModelMBean;
+
 
 public class RSA {
 	private BigInteger n;
@@ -77,7 +77,7 @@ public class RSA {
 		if (plain.compareTo(BigInteger.ZERO) <= 0) {
 			throw new BadMessageException("plaintext too small");
 		}else {
-			BigInteger cipher =  n.mod(plain.pow(Integer.valueOf(PUBLIC_EXPONENT)));
+			BigInteger cipher =  n.mod(plain.modPow(PUBLIC_EXPONENT, plain));
 			return cipher;
 		}
 			
@@ -104,7 +104,7 @@ public class RSA {
 			throw new BadMessageException("ciphertext too small");
 		}else {
 			
-			BigInteger plain = n.mod(n.mod(d.pow(cipher.pow(Integer.valueOf(PUBLIC_EXPONENT)))));
+			BigInteger plain = n.mod(cipher.modPow(d, cipher));
 			return plain;
 		}
 		
