@@ -7,12 +7,11 @@ import java.io.OptionalDataException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.Signature;
 import java.security.SignatureException;
+import java.util.Random;
 
 
 
@@ -48,7 +47,7 @@ public class RSA {
 				.multiply(q.subtract(BigInteger.ONE));
 
 		// Generate public and private exponents
-		this.e = PUBLIC_EXPONENT
+		this.e = PUBLIC_EXPONENT;
 		this.d = e.modInverse(phi);
 
 
@@ -160,7 +159,7 @@ public class RSA {
 	 * @throws NoSuchAlgorithmException 
 	 */
 	public BigInteger sign(BigInteger message) throws BadMessageException, SignatureException, InvalidKeyException, NoSuchAlgorithmException {
-		BigInteger signature = message.modPow(d,n)
+		BigInteger signature = message.modPow(d,n);
 		return signature;
 		
 		
@@ -179,7 +178,7 @@ public class RSA {
 	public boolean verify(BigInteger message, BigInteger signature) throws BadMessageException {
 		if(signature.modPow(e,n) == message){
 			return true;
-		}
+		}return false;
 
 	}
 	

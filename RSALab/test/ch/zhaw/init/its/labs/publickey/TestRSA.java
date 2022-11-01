@@ -8,20 +8,23 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 
 import org.junit.jupiter.api.Test;
 
 public class TestRSA {
 
 	@Test
-	void testGeneration() {
+	void testGeneration() throws NoSuchAlgorithmException {
 		for (int i = 0; i < 100; i++) {
 			RSA rsa = new RSA();
 		}
 	}
 
 	@Test
-	void testEncryptDecrypt() throws BadMessageException {
+	void testEncryptDecrypt() throws BadMessageException, NoSuchAlgorithmException {
 		RSA rsa = new RSA();
 		BigInteger message = BigInteger.ONE;
 		
@@ -38,7 +41,7 @@ public class TestRSA {
 	}
 	
 	@Test
-	void testSignVerify() throws BadMessageException {
+	void testSignVerify() throws BadMessageException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
 		RSA rsa = new RSA();
 		BigInteger message = BigInteger.ONE;
 		
@@ -54,7 +57,7 @@ public class TestRSA {
 	}
 	
 	@Test
-	void testSerialize() throws IOException, ClassNotFoundException {
+	void testSerialize() throws IOException, ClassNotFoundException, NoSuchAlgorithmException {
 		for (int i = 0; i < 100; i++) {
 			RSA rsa = new RSA();
 			
