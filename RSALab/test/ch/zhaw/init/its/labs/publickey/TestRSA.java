@@ -11,7 +11,7 @@ import java.math.BigInteger;
 
 import org.junit.jupiter.api.Test;
 
-class TestRSA {
+public class TestRSA {
 
 	@Test
 	void testGeneration() {

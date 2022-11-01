@@ -36,11 +36,30 @@ public class RSA {
 	 * @throws NoSuchAlgorithmException 
 	 */
 	public RSA() throws NoSuchAlgorithmException {
-		KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("RSA");
+		/*KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("RSA");
 		keyPairGen.initialize(DEFAULT_MODULUS_LENGTH);
 		pair = keyPairGen.generateKeyPair();
 		publicKey = pair.getPublic();
-		System.out.println("Keys generated");
+		System.out.println("Keys generated");*/
+
+		// Generate random primes
+		Random rand = new SecureRandom();
+		BigInteger p = BigInteger.probablePrime(DEFAULT_P_LENGTH, rand);
+		BigInteger q = BigInteger.probablePrime(DEFAULT_Q_LENGTH , rand);
+
+		//Calculate n and phi
+		this.n = p.multiply(q);
+		BigInteger phi = p.subtract(BigInteger.ONE)
+				.multiply(q.subtract(BigInteger.ONE));
+
+		// Generate public and private exponents
+		do this.e = new BigInteger(phi.bitLength(), rand);
+		while (e.compareTo(BigInteger.ONE) <= 0
+				|| e.compareTo(phi) >= 0
+				|| !e.gcd(phi).equals(BigInteger.ONE));
+		this.d = e.modInverse(phi);
+
+
 		
 		// --------> Your solution here! <--------
 	}
