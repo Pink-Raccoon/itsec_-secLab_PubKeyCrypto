@@ -7,12 +7,11 @@ import java.io.OptionalDataException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.Signature;
 import java.security.SignatureException;
+import java.util.Random;
 
 
 
@@ -36,11 +35,6 @@ public class RSA {
 	 * @throws NoSuchAlgorithmException 
 	 */
 	public RSA() throws NoSuchAlgorithmException {
-		/*KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("RSA");
-		keyPairGen.initialize(DEFAULT_MODULUS_LENGTH);
-		pair = keyPairGen.generateKeyPair();
-		publicKey = pair.getPublic();
-		System.out.println("Keys generated");*/
 
 		// Generate random primes
 		Random rand = new SecureRandom();
@@ -53,10 +47,7 @@ public class RSA {
 				.multiply(q.subtract(BigInteger.ONE));
 
 		// Generate public and private exponents
-		do this.e = new BigInteger(phi.bitLength(), rand);
-		while (e.compareTo(BigInteger.ONE) <= 0
-				|| e.compareTo(phi) >= 0
-				|| !e.gcd(phi).equals(BigInteger.ONE));
+		this.e = PUBLIC_EXPONENT;
 		this.d = e.modInverse(phi);
 
 
@@ -98,8 +89,8 @@ public class RSA {
 		if (plain.compareTo(BigInteger.ZERO) <= 0) {
 			throw new BadMessageException("plaintext too small");
 		}else {
-			BigInteger cipher =  n.mod(plain.modPow(PUBLIC_EXPONENT, plain));
-			return cipher;
+			BigInteger encrypted =  plain.modPow(PUBLIC_EXPONENT, n);
+			return encrypted;
 		}
 			
 		// --------> Your solution here! <--------
@@ -125,8 +116,8 @@ public class RSA {
 			throw new BadMessageException("ciphertext too small");
 		}else {
 			
-			BigInteger plain = n.mod(cipher.modPow(d, cipher));
-			return plain;
+			BigInteger decrypted = cipher.modPow(d, n);
+			return decrypted;
 		}
 		
 
@@ -168,12 +159,7 @@ public class RSA {
 	 * @throws NoSuchAlgorithmException 
 	 */
 	public BigInteger sign(BigInteger message) throws BadMessageException, SignatureException, InvalidKeyException, NoSuchAlgorithmException {
-		Signature sig = Signature.getInstance("RSA");
-		sig.initSign(pair.getPrivate());
-		byte[] messageBytes = message.toByteArray();
-		sig.update(messageBytes);
-		byte[] signatureBytes = sig.sign();
-		BigInteger signature = new BigInteger(signatureBytes);
+		BigInteger signature = message.modPow(d,n);
 		return signature;
 		
 		
@@ -190,16 +176,10 @@ public class RSA {
 	 * @throws BadMessageException if something is wrong with this message
 	 */
 	public boolean verify(BigInteger message, BigInteger signature) throws BadMessageException {
-		if((message.compareTo(BigInteger.valueOf(1))==-1 && message.compareTo(n.subtract(BigInteger.valueOf(1)))==1)
-				&& (signature.compareTo(BigInteger.valueOf(1))==-1 && signature.compareTo(n.subtract(BigInteger.valueOf(1)))==1))
-		{
+		if(signature.modPow(e,n).equals(message)){
 			return true;
-		}
-		// --------> Your solution here! <--------
-		else {
-			throw new BadMessageException("message not between 1 and n-1");
-			
-		}
+		}return false;
+
 	}
 	
 	public boolean equals(RSA other) {
