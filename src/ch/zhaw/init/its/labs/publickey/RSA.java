@@ -5,12 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OptionalDataException;
 import java.math.BigInteger;
-import java.security.InvalidKeyException;
-import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.SignatureException;
 import java.util.Random;
 
 
@@ -31,9 +26,8 @@ public class RSA {
 	 * 
 	 * This constructor generates a random RSA key pair of unknown, but substantial,
 	 * modulus length. The public exponent is 65537.
-	 * @throws NoSuchAlgorithmException 
 	 */
-	public RSA() throws NoSuchAlgorithmException {
+	public RSA() {
 
 		// Generate random primes
 		Random rand = new SecureRandom();
@@ -102,7 +96,7 @@ public class RSA {
 	 * @return
 	 * @throws BadMessageException
 	 */
-	public BigInteger decrypt(BigInteger cipher) throws BadMessageException {
+	public BigInteger decrypt(BigInteger cipher) throws BadMessageException, IOException {
 		if (d == null) {
 			throw new BadMessageException("don't have private key");
 		}
@@ -113,12 +107,13 @@ public class RSA {
 		
 		if (cipher.compareTo(BigInteger.ZERO) <= 0) {
 			throw new BadMessageException("ciphertext too small");
-		}else {
-			
-			BigInteger decrypted = cipher.modPow(d, n);
-			return decrypted;
 		}
 		
+		if (d != null) {
+			return cipher.modPow(d, n);
+		} else {
+			throw new IOException("don't have private key to decrypt");
+		}
 
 		
 	}
@@ -153,16 +148,18 @@ public class RSA {
 	 * @param message the message to sign
 	 * @return the signature for this message
 	 * @throws BadMessageException if something is wrong with this message or there is no private key
+	 * @throws IOException
 	 * @throws SignatureException 
 	 * @throws InvalidKeyException 
 	 * @throws NoSuchAlgorithmException 
 	 */
-	public BigInteger sign(BigInteger message) throws BadMessageException, SignatureException, InvalidKeyException, NoSuchAlgorithmException {
-		if()
-		BigInteger signature = message.modPow(d,n);
-		return signature;
-		
-		
+	public BigInteger sign(BigInteger message) throws BadMessageException, IOException {
+		if (d != null) {
+			return message.modPow(d,n);
+		} else {
+			throw new IOException("don't have private key to sign");
+		}
+
 
 		// --------> Your solution here! <--------
 
