@@ -19,8 +19,7 @@ public class RSA {
 	private BigInteger n;
 	private BigInteger e;
 	private BigInteger d;
-	private KeyPair pair;
-	private PublicKey publicKey;
+
 	
 	private static final int DEFAULT_MODULUS_LENGTH = 2048;
 	private static final int DEFAULT_P_LENGTH = DEFAULT_MODULUS_LENGTH/2 - 9;
@@ -159,6 +158,7 @@ public class RSA {
 	 * @throws NoSuchAlgorithmException 
 	 */
 	public BigInteger sign(BigInteger message) throws BadMessageException, SignatureException, InvalidKeyException, NoSuchAlgorithmException {
+		if()
 		BigInteger signature = message.modPow(d,n);
 		return signature;
 		
