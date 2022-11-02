@@ -17,10 +17,11 @@ import java.security.NoSuchAlgorithmException;
 public class PublicKeyLab {
 	private static final String messageFilename = "message-with-signature.bin";
 	private static final String keypairFilename = "keypair.rsa";
-	private static final String pubKeyFilename = "id_rsa.pub";
 
 	public static void main(String[] args) throws FileNotFoundException, IOException, ClassNotFoundException, BadMessageException, NoSuchAlgorithmException {
 		PublicKeyLab lab = new PublicKeyLab();
+		
+		lab.generateKeypairIfNotExists();
 		
 		lab.exercise1();
 		lab.exercise3EncryptFromCommandLine();
@@ -44,8 +45,7 @@ public class PublicKeyLab {
 		File f = new File(keypairFilename);
 		if (!f.canRead()) {
 			try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(f))) {
-
-
+				new RSA().save(os);
 			}
 		}
 	}
@@ -121,23 +121,30 @@ public class PublicKeyLab {
 	 * @throws ClassNotFoundException 
 	 * @throws BadMessageException 
 	 */
-	public void exercise3EncryptFromCommandLine() throws IOException, NoSuchAlgorithmException, ClassNotFoundException, BadMessageException{
-		BufferedReader reader = new BufferedReader (new InputStreamReader(System.in));
-		System.out.println("Please write a message to be encrypted: \n");
-		String message = reader.readLine();
-		byte[] messageInAscii = message.getBytes(StandardCharsets.US_ASCII);
-		BigInteger messageAsBigInt = new BigInteger(messageInAscii);
+	public void exercise3EncryptFromCommandLine() throws NoSuchAlgorithmException, ClassNotFoundException, BadMessageException, IOException{
 		
-		FileInputStream file = new FileInputStream(pubKeyFilename);
+		RSA rsa;
+		try (ObjectInputStream is = new ObjectInputStream(new FileInputStream(keypairFilename))) {
+			rsa = new RSA(is);
+		}
 		
-			
+		BigInteger encryptedMessage;
+		try (BufferedReader reader = new BufferedReader (new InputStreamReader(System.in))) {
+			System.out.println("Please write a message to be encrypted: ");
+			String message = reader.readLine();
+			encryptedMessage = rsa.encrypt(new BigInteger(message.getBytes(StandardCharsets.US_ASCII)));
+		}
+
+		String outputFilename = "excercise3output";
 		
-		ObjectInputStream is = new ObjectInputStream(file);
-		RSA rsa = new RSA(is);
-		BigInteger encryption = rsa.encrypt(messageAsBigInt);
-		File output = new File(encryption.toString());
-		ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(output));
-		rsa.save(os);
+		try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(outputFilename))) {
+			os.writeObject(encryptedMessage);
+		}
+		
+		try (ObjectInputStream is = new ObjectInputStream(new FileInputStream(outputFilename))) {
+			BigInteger decryptedMessageAsBigInt = rsa.decrypt((BigInteger) is.readObject());
+			System.out.println("Decrypted message: " + new String(decryptedMessageAsBigInt.toByteArray(), StandardCharsets.US_ASCII));
+		}
 	}
 	
 	public void exercise3DecryptFromObjStream() throws FileNotFoundException, IOException, ClassNotFoundException, BadMessageException{
