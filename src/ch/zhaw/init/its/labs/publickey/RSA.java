@@ -176,7 +176,11 @@ public class RSA {
 	 * @throws BadMessageException if something is wrong with this message
 	 */
 	public boolean verify(BigInteger message, BigInteger signature) throws BadMessageException {
+<<<<<<< HEAD:src/ch/zhaw/init/its/labs/publickey/RSA.java
 		if(signature.modPow(e,n).equals(message)){
+=======
+		if(signature.modPow(e,n) == message){
+>>>>>>> 06301545f70c442dc4c3d6facd04db09529dca40:RSALab/src/ch/zhaw/init/its/labs/publickey/RSA.java
 			return true;
 		}return false;
 
