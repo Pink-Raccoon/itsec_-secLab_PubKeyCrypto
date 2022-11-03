@@ -17,6 +17,7 @@ import java.security.NoSuchAlgorithmException;
 public class PublicKeyLab {
 	private static final String messageFilename = "message-with-signature.bin";
 	private static final String keypairFilename = "keypair.rsa";
+	private static final String outputFilenamePattern = "exercise_%d_%s";
 
 	public static void main(String[] args) throws FileNotFoundException, IOException, ClassNotFoundException, BadMessageException, NoSuchAlgorithmException {
 		PublicKeyLab lab = new PublicKeyLab();
@@ -135,7 +136,7 @@ public class PublicKeyLab {
 			encryptedMessage = rsa.encrypt(new BigInteger(message.getBytes(StandardCharsets.US_ASCII)));
 		}
 
-		String outputFilename = "excercise3output";
+		String outputFilename = String.format(outputFilenamePattern, 3, "out1");
 		
 		try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(outputFilename))) {
 			os.writeObject(encryptedMessage);
