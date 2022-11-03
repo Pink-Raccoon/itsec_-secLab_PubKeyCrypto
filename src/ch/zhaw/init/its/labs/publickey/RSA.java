@@ -75,6 +75,7 @@ public class RSA {
 	 * @throws BadMessageException then the plain text is too large or too small
 	 */
 	public BigInteger encrypt(BigInteger plain) throws BadMessageException {
+		
 		if (plain.compareTo(n) > 0) {
 			throw new BadMessageException("plaintext too large");
 		}
@@ -85,9 +86,6 @@ public class RSA {
 			BigInteger encrypted =  plain.modPow(PUBLIC_EXPONENT, n);
 			return encrypted;
 		}
-			
-		// --------> Your solution here! <--------
-		
 	}
 	
 	/** Decrypts the ciphertext with the private key.
@@ -97,6 +95,7 @@ public class RSA {
 	 * @throws BadMessageException
 	 */
 	public BigInteger decrypt(BigInteger cipher) throws BadMessageException, IOException {
+		
 		if (d == null) {
 			throw new BadMessageException("don't have private key");
 		}
@@ -114,8 +113,6 @@ public class RSA {
 		} else {
 			throw new IOException("don't have private key to decrypt");
 		}
-
-		
 	}
 	
 	/** Saves the entire key pair.
@@ -148,37 +145,25 @@ public class RSA {
 	 * @param message the message to sign
 	 * @return the signature for this message
 	 * @throws BadMessageException if something is wrong with this message or there is no private key
-	 * @throws IOException
-	 * @throws SignatureException 
-	 * @throws InvalidKeyException 
-	 * @throws NoSuchAlgorithmException 
 	 */
-	public BigInteger sign(BigInteger message) throws BadMessageException, IOException {
+	public BigInteger sign(BigInteger message) throws BadMessageException {
 		if (d != null) {
 			return message.modPow(d,n);
 		} else {
-			throw new IOException("don't have private key to sign");
+			throw new BadMessageException("don't have private key to sign");
 		}
-
-
-		// --------> Your solution here! <--------
-
 	}
 
 	/** Verifies a signature of a message.
 	 * 
 	 * @param message the message whose signature to check
 	 * @param signature the signature to check
-	 * @return true iff the signature was made for this message by this key
+	 * @return true if the signature was made for this message by this key
 	 * @throws BadMessageException if something is wrong with this message
 	 */
 	public boolean verify(BigInteger message, BigInteger signature) throws BadMessageException {
 
-		if(signature.modPow(e,n).equals(message)){
-			return true;
-		}
-			return false;
-
+		return signature.modPow(e,n).equals(message) ? true : false;
 	}
 	
 	public boolean equals(RSA other) {
