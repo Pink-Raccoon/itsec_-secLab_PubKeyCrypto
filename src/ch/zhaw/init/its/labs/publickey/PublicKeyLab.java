@@ -18,16 +18,18 @@ public class PublicKeyLab {
 	private static final String messageFilename = "message-with-signature.bin";
 	private static final String keypairFilename = "keypair.rsa";
 	private static final String outputFilenamePattern = "exercise_%d_%s";
+	
+	private static final BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in));
 
-	public static void main(String[] args) throws FileNotFoundException, IOException, ClassNotFoundException, BadMessageException, NoSuchAlgorithmException {
+	public static void main(String[] args) throws FileNotFoundException, IOException, ClassNotFoundException, BadMessageException, NoSuchAlgorithmException {		
 		PublicKeyLab lab = new PublicKeyLab();
 		
 		lab.generateKeypairIfNotExists();
 		
 		lab.exercise1();
 		lab.exercise3();
-		//lab.exercise9GenerateSignature();
-		//lab.exercise9VerifySignature();
+		lab.exercise9GenerateSignature();
+		lab.exercise9VerifySignature();
 	}
 	
 	private void exercise1() {
@@ -50,58 +52,48 @@ public class PublicKeyLab {
 	 */
 	public void exercise3() throws FileNotFoundException, IOException, ClassNotFoundException, BadMessageException {
 		
+		banner("Exercise 3 (message encryption/decryption)");
+		
+		System.out.println("Reading message to be encrypted...");
+		BigInteger message = readEncodedMessageFromCommandline();
+		
 		RSA rsa;
 		try (ObjectInputStream is = new ObjectInputStream(new FileInputStream(keypairFilename))) {
 			rsa = new RSA(is);
 		}
 		
-		BigInteger message;
-		try (BufferedReader reader = new BufferedReader (new InputStreamReader(System.in))) {
-			System.out.println("Please write a message to be encrypted: ");
-			String messageString = reader.readLine();
-			message = rsa.encrypt(BigIntegerEncoder.encode(messageString));
-		}
-
 		String outputFilename = String.format(outputFilenamePattern, 3, "out1");
 		
+		System.out.println("Writing encrypted message to file...");
 		try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(outputFilename))) {
-			os.writeObject(message);
+			os.writeObject(rsa.encrypt(message));
 		}
 		
+		System.out.println("Decrypting message from file...");
 		try (ObjectInputStream is = new ObjectInputStream(new FileInputStream(outputFilename))) {
-			BigInteger decryptedMessageAsBigInt = rsa.decrypt((BigInteger) is.readObject());
-			
-			System.out.println("Decrypted message: " + BigIntegerEncoder.decode(decryptedMessageAsBigInt));
+			System.out.printf("Decrypted message: %s%n", BigIntegerEncoder.decode(rsa.decrypt((BigInteger) is.readObject())));
 		}
 	}
 
-	private void exercise9GenerateSignature() throws BadMessageException, FileNotFoundException, IOException {
-		
-		final BigInteger message;
-		try (BufferedReader reader = new BufferedReader (new InputStreamReader(System.in))) {
-			System.out.println("Please write a message to be encrypted: ");
-			String messageString = reader.readLine();
-			message = BigIntegerEncoder.encode(messageString);;
-		}
-		
+	private void exercise9GenerateSignature() throws BadMessageException, FileNotFoundException, IOException, ClassNotFoundException {
 		banner("Exercise 11 (signature generation)");
 		
-		// --------> Your solution here! <--------
+		System.out.println("Reading message to be signed...");
+		final BigInteger message = readEncodedMessageFromCommandline();
+				
+		RSA rsa;
+		try (ObjectInputStream is = new ObjectInputStream(new FileInputStream(keypairFilename))) {
+			rsa = new RSA(is);
+		}
 		
-		
-	}
-
-	private void generateKeypairIfNotExists() throws FileNotFoundException, IOException {
-		// Generate keypair if none exists
-		File f = new File(keypairFilename);
-		if (!f.canRead()) {
-			try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(f))) {
-				new RSA().save(os);
-			}
+		System.out.println("Writing message and signature to file...");
+		try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(messageFilename))) {
+			os.writeObject(message);
+			os.writeObject(rsa.sign(message));
 		}
 	}
 
-	private void exercise9VerifySignature(String[] args) throws BadMessageException {
+	private void exercise9VerifySignature() throws BadMessageException {
 		boolean ok = false;
 
 		banner("Exercise 11 (signature verification)");
@@ -109,19 +101,34 @@ public class PublicKeyLab {
 		try (ObjectInputStream key = new ObjectInputStream(new FileInputStream(keypairFilename))) {
 			final RSA keypair = new RSA(key);
 			
-			// --------> Your solution here! <--------
+			try (ObjectInputStream is = new ObjectInputStream(new FileInputStream(messageFilename))) {
+				BigInteger message = (BigInteger) is.readObject();
+				BigInteger signature = (BigInteger) is.readObject();
+				
+				System.out.println("Verifying signature for provided message...");
+				if (keypair.verify(message, signature)) {
+					System.out.println("Signature verified successfully");
+					System.out.printf("Decoded message: %s%n", BigIntegerEncoder.decode(message));
+				} else {
+					System.out.println("Signature did not verify successfully");			
+				}
+			}
 		} catch (FileNotFoundException e) {
 			System.err.println("Can't find keypair file \"" + keypairFilename + "\"");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
-		} 	
-		
-		if (ok) {
-			System.out.println("Signature verified successfully");
-		} else {
-			System.out.println("Signature did not verify successfully");			
+		}
+	}
+	
+	private void generateKeypairIfNotExists() throws FileNotFoundException, IOException {
+		// Generate keypair if none exists
+		File f = new File(keypairFilename);
+		if (!f.canRead()) {
+			try (ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(f))) {
+				new RSA().save(os);
+			}
 		}
 	}
 
@@ -147,6 +154,12 @@ public class PublicKeyLab {
 		}
 		
 		return b;	
+	}
+	
+	private BigInteger readEncodedMessageFromCommandline() throws IOException {
+		System.out.println("Please write a message: ");
+		String messageString = consoleReader.readLine();
+		return BigIntegerEncoder.encode(messageString);
 	}
 
 	private double logW(int b) {
